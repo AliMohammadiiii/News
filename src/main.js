@@ -16,7 +16,8 @@ import {
   createFilterChips,
   createNewsCard,
   createLoadingSpinner,
-  createErrorMessage
+  createErrorMessage,
+  createFilterModal
 } from './components.js';
 
 class NewsApp {
@@ -29,7 +30,14 @@ class NewsApp {
     this.agencies = [];
     this.activeFilters = {};
     this.isLoading = false;
-    
+    this.isFilterModalOpen = false;
+    this.selectedFilters = {
+      agencies: [],
+      categories: [],
+      startDate: '',
+      endDate: ''
+    };
+
     this.init();
   }
 
@@ -94,7 +102,7 @@ class NewsApp {
       'آلمان: نگران بحران انسانی در اوکراین هستیم',
       'بانک‌ها به استانداردسازی صدور تأییدیه‌های اعتباری ملزم شدند',
       'حمله هوایی به مواضع داعش در سوریه',
-      'ذخایر اس��راتژیک دارو برای مقابله با اثرات فعال‌سازی مکانیسم ماشه شدند',
+      'ذخایر استراتژیک دارو برای مقابله با اثرات فعال‌سازی مکانیسم ماشه شدند',
       'نگران بحران انسانی در اوکراین هستیم',
       'جلسه مهم کابینه درباره وضعیت اقتصادی کشور',
       'کاهش قیمت نفت در بازارهای جهانی',
@@ -103,10 +111,10 @@ class NewsApp {
 
     const mockContents = [
       'دونالد ترامپ، رئیس جمهور امریکا در پاسخ به سوال خبرنگار مبنی بر این که «آیا در صورت ادامه تشدید تنش‌ها توسط روسیه، به دفاع از لهستان کمک خواهد کرد یا خیر» گفت: «من این کار را خواهم کرد»',
-      'حسین امیرعبداللهیان گفت: «ما همچنان امیدواریم که مذاکرات به نتیجه برسد و منافع ملت ایران تأمین شود»',
+      'حسین امیرعبداللهیان گفت: «ما همچنان امیدواریم که مذ��کرات به نتیجه برسد و منافع ملت ایران تأمین شود»',
       'وزیر امور خارجه آلمان اعلام کرد که کشورش از ادامه حمایت‌های بشردوستانه به مردم اوکراین حمایت خواهد کرد.',
       'بانک مرکزی اعلام کرد که تمامی بانک‌ها ملزم به رعایت استانداردهای جدید هستند.',
-      '��یروهای ائتلاف بین‌المللی موفق به هدف‌گیری چندین موضع گروه داعش در شمال سوریه شدند.',
+      'نیروهای ائتلاف بین‌المللی موفق به هدف‌گیری چندین موضع گروه داعش در شمال سوریه شدند.',
       'وزارت بهداشت اعلام کرد که ذخایر دارویی کشور در وضعیت مطلوبی قرار دارد.',
       'سازمان ملل نسبت به وضعیت انسان‌دوستانه در منطقه ابراز نگرانی کرد.',
       'رئیس جمهور در جلسه کابینه بر ضرورت اقدامات فوری اقتصادی تاکید کرد.',
@@ -297,14 +305,20 @@ class NewsApp {
     document.querySelectorAll('.filter-chip').forEach(btn => {
       btn.classList.remove('active');
     });
-    
+
     // Add active class to clicked button
     buttonElement.classList.add('active');
-    
+
     // Handle different filter types
     switch (filterType) {
       case 'all':
         this.activeFilters = {};
+        this.selectedFilters = {
+          agencies: [],
+          categories: [],
+          startDate: '',
+          endDate: ''
+        };
         await this.loadLatestNews();
         break;
       case 'category':
@@ -316,8 +330,8 @@ class NewsApp {
         console.log('Date filter clicked');
         break;
       case 'filter':
-        // Show filter panel
-        console.log('Filter panel clicked');
+        // Show filter modal
+        this.showFilterModal();
         break;
     }
   }
@@ -330,6 +344,7 @@ class NewsApp {
       this.updateNewsList();
     } catch (error) {
       console.error('Failed to load news:', error);
+      // In case of error, don't show empty list, keep existing news
     } finally {
       this.setLoading(false);
     }
@@ -370,6 +385,211 @@ class NewsApp {
     } else {
       console.log('News detail:', newsItem);
     }
+  }
+
+  showFilterModal() {
+    this.isFilterModalOpen = true;
+    this.renderFilterModal();
+    this.setupFilterModalEvents();
+  }
+
+  hideFilterModal() {
+    this.isFilterModalOpen = false;
+    const modal = document.querySelector('.filter-modal-overlay');
+    if (modal) {
+      modal.remove();
+    }
+  }
+
+  renderFilterModal() {
+    const modalHtml = createFilterModal(this.agencies, this.categories, this.selectedFilters);
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  setupFilterModalEvents() {
+    const modal = document.querySelector('.filter-modal-overlay');
+    if (!modal) return;
+
+    // Close modal on overlay click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        this.hideFilterModal();
+      }
+    });
+
+    // Close button
+    const closeBtn = modal.querySelector('.filter-modal-close');
+    closeBtn?.addEventListener('click', () => {
+      this.hideFilterModal();
+    });
+
+    // Dropdown toggle
+    const dropdownToggle = modal.querySelector('.filter-dropdown-toggle');
+    const dropdownContent = modal.querySelector('.filter-dropdown-content');
+    dropdownToggle?.addEventListener('click', () => {
+      dropdownContent?.classList.toggle('open');
+    });
+
+    // Agency checkboxes
+    const agencyItems = modal.querySelectorAll('.filter-dropdown-item');
+    agencyItems.forEach(item => {
+      item.addEventListener('click', () => {
+        this.toggleAgencyFilter(item);
+      });
+    });
+
+    // Category chips
+    const categoryChips = modal.querySelectorAll('.filter-category-chip');
+    categoryChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        this.toggleCategoryFilter(chip);
+      });
+    });
+
+    // Remove selected filter tags
+    const removeTags = modal.querySelectorAll('.selected-filter-tag-close');
+    removeTags.forEach(tag => {
+      tag.addEventListener('click', () => {
+        this.removeSelectedFilter(tag);
+      });
+    });
+
+    // Date inputs
+    const dateInputs = modal.querySelectorAll('.filter-date-field');
+    dateInputs.forEach(input => {
+      input.addEventListener('change', () => {
+        this.updateDateFilter(input);
+      });
+    });
+
+    // Apply filter button
+    const applyBtn = modal.querySelector('.filter-apply-btn');
+    applyBtn?.addEventListener('click', () => {
+      this.applyFilters();
+    });
+
+    // Clear filter button
+    const clearBtn = modal.querySelector('.filter-clear-btn');
+    clearBtn?.addEventListener('click', () => {
+      this.clearFilters();
+    });
+  }
+
+  toggleAgencyFilter(item) {
+    const agencyId = parseInt(item.dataset.agencyId);
+    const agency = this.agencies.find(a => a.id === agencyId);
+    if (!agency) return;
+
+    const existingIndex = this.selectedFilters.agencies.findIndex(a => a.id === agencyId);
+    if (existingIndex >= 0) {
+      // Remove agency
+      this.selectedFilters.agencies.splice(existingIndex, 1);
+    } else {
+      // Add agency
+      this.selectedFilters.agencies.push(agency);
+    }
+
+    // Update modal display
+    this.updateFilterModal();
+  }
+
+  toggleCategoryFilter(chip) {
+    const categoryId = parseInt(chip.dataset.categoryId);
+    const category = this.categories.find(c => c.id === categoryId);
+    if (!category) return;
+
+    const existingIndex = this.selectedFilters.categories.findIndex(c => c.id === categoryId);
+    if (existingIndex >= 0) {
+      // Remove category
+      this.selectedFilters.categories.splice(existingIndex, 1);
+    } else {
+      // Add category
+      this.selectedFilters.categories.push(category);
+    }
+
+    // Update modal display
+    this.updateFilterModal();
+  }
+
+  removeSelectedFilter(tag) {
+    const agencyId = tag.closest('[data-agency-id]')?.dataset.agencyId;
+    const categoryId = tag.closest('[data-category-id]')?.dataset.categoryId;
+
+    if (agencyId) {
+      const index = this.selectedFilters.agencies.findIndex(a => a.id === parseInt(agencyId));
+      if (index >= 0) {
+        this.selectedFilters.agencies.splice(index, 1);
+      }
+    }
+
+    if (categoryId) {
+      const index = this.selectedFilters.categories.findIndex(c => c.id === parseInt(categoryId));
+      if (index >= 0) {
+        this.selectedFilters.categories.splice(index, 1);
+      }
+    }
+
+    // Update modal display
+    this.updateFilterModal();
+  }
+
+  updateDateFilter(input) {
+    const dateType = input.dataset.dateType;
+    const value = input.value;
+
+    if (dateType === 'start') {
+      this.selectedFilters.startDate = value;
+    } else if (dateType === 'end') {
+      this.selectedFilters.endDate = value;
+    }
+  }
+
+  updateFilterModal() {
+    // Close current modal
+    this.hideFilterModal();
+
+    // Reopen with updated state
+    this.isFilterModalOpen = true;
+    this.renderFilterModal();
+    this.setupFilterModalEvents();
+  }
+
+  async applyFilters() {
+    // Convert selected filters to API format
+    const apiFilters = {};
+
+    if (this.selectedFilters.agencies.length > 0) {
+      // For multiple agencies, we might need to make multiple requests or use agency_id parameter
+      // For now, let's use the first selected agency
+      apiFilters.agency_id = this.selectedFilters.agencies[0].id;
+    }
+
+    if (this.selectedFilters.categories.length > 0) {
+      // For multiple categories, use the first selected category
+      apiFilters.category_id = this.selectedFilters.categories[0].id;
+    }
+
+    // Store the filters
+    this.activeFilters = { ...apiFilters };
+
+    // Close modal
+    this.hideFilterModal();
+
+    // Load filtered news
+    await this.loadLatestNews(apiFilters);
+  }
+
+  clearFilters() {
+    this.selectedFilters = {
+      agencies: [],
+      categories: [],
+      startDate: '',
+      endDate: ''
+    };
+    this.activeFilters = {};
+
+    // Update modal display
+    this.updateFilterModal();
   }
 
   destroy() {
