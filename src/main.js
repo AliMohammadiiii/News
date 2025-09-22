@@ -77,7 +77,7 @@ class NewsApp {
       console.error('Failed to load initial data:', error);
       this.featuredNews = [];
       this.latestNews = [];
-      throw error;
+      // Do not rethrow; allow UI to render with empty state instead of crashing
     } finally {
       this.setLoading(false);
     }
