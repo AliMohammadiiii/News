@@ -93,6 +93,9 @@ export function createNewsCard(newsItem, hasImage = true) {
 
   const relativeTime = formatRelativeTime(pubDate);
   const agencyImageUrl = agency.image_url || getDefaultAgencyLogo(agency.name);
+  const agencyNameElement = agency.website
+    ? `<a href="${agency.website}" class="news-card-agency-name" target="_blank" rel="noopener noreferrer">${agency.name}</a>`
+    : `<span class="news-card-agency-name">${agency.name}</span>`;
   const shouldShowImage = hasImage && image_url;
 
   return `
@@ -103,14 +106,14 @@ export function createNewsCard(newsItem, hasImage = true) {
           <span>${relativeTime}</span>
         </div>
         <div class="news-card-agency">
-          <span class="news-card-agency-name">${agency.name}</span>
+          ${agencyNameElement}
           <img src="${agencyImageUrl}" alt="${agency.name}" loading="lazy" />
         </div>
       </header>
-      
+
       <div class="news-card-content">
         <h2 class="news-card-title">${title}</h2>
-        
+
         <div class="news-card-body">
           <div class="news-card-text">
             ${content}
@@ -120,7 +123,7 @@ export function createNewsCard(newsItem, hasImage = true) {
           ` : ''}
         </div>
       </div>
-      
+
       <footer class="news-card-footer">
         <a href="${link}" class="view-button" target="_blank" rel="noopener noreferrer">
           ${createExternalLinkIcon()}
@@ -147,13 +150,16 @@ export function createFeaturedCard(newsItem) {
 
   const agencyImageUrl = agency.image_url || getDefaultAgencyLogo(agency.name);
   const fallbackImage = 'https://via.placeholder.com/314x314/1DBF98/FFFFFF?text=خبر';
+  const agencyNameElement = agency.website
+    ? `<a href="${agency.website}" class="featured-card-agency-name" target="_blank" rel="noopener noreferrer">${agency.name}</a>`
+    : `<span class="featured-card-agency-name">${agency.name}</span>`;
 
   return `
     <div class="featured-card" data-news-id="${id}">
       <img src="${image_url || fallbackImage}" alt="${title}" loading="lazy" />
       <div class="featured-card-overlay">
         <div class="featured-card-agency">
-          <span class="featured-card-agency-name">${agency.name}</span>
+          ${agencyNameElement}
           <img src="${agencyImageUrl}" alt="${agency.name}" loading="lazy" />
         </div>
         <h3 class="featured-card-title">${title}</h3>

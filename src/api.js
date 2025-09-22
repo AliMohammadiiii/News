@@ -107,27 +107,29 @@ export async function getFeaturedNews(limit = 5) {
  */
 export function formatRelativeTime(timestamp) {
   const now = Math.floor(Date.now() / 1000);
-  const diff = now - timestamp;
-  
+  const delta = now - timestamp;
+  const future = delta < 0;
+  const diff = Math.abs(delta);
+
   const minute = 60;
   const hour = minute * 60;
   const day = hour * 24;
   const week = day * 7;
-  
+
   if (diff < minute) {
-    return 'هم‌اکنون';
+    return future ? 'به‌زودی' : 'هم‌اکنون';
   } else if (diff < hour) {
     const minutes = Math.floor(diff / minute);
-    return `${minutes} دقیقه پیش`;
+    return `${minutes} دقیقه ${future ? 'دیگر' : 'پیش'}`;
   } else if (diff < day) {
     const hours = Math.floor(diff / hour);
-    return `${hours} ساعت پیش`;
+    return `${hours} ساعت ${future ? 'دیگر' : 'پیش'}`;
   } else if (diff < week) {
     const days = Math.floor(diff / day);
-    return `${days} روز پیش`;
+    return `${days} روز ${future ? 'دیگر' : 'پیش'}`;
   } else {
     const weeks = Math.floor(diff / week);
-    return `${weeks} هفته پیش`;
+    return `${weeks} هفته ${future ? 'دیگر' : 'پیش'}`;
   }
 }
 
