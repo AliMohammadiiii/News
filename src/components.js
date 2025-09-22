@@ -270,3 +270,222 @@ export function createErrorMessage(message) {
     </div>
   `;
 }
+
+/**
+ * Create close icon SVG
+ * @returns {string}
+ */
+function createCloseIcon() {
+  return `
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13.9787 14.2706C14.2293 14.02 14.2293 13.6045 13.9787 13.354L6.64599 6.02123C6.39545 5.77069 5.97993 5.77069 5.7294 6.02123C5.47886 6.27176 5.47886 6.68729 5.7294 6.93782L13.0621 14.2706C13.3127 14.5211 13.7282 14.5211 13.9787 14.2706Z" fill="#242933"/>
+      <path d="M6.6452 14.2706L13.9779 6.93782C14.2285 6.68729 14.2285 6.27176 13.9779 6.02123C13.7274 5.77069 13.3119 5.77069 13.0613 6.02123L5.72861 13.354C5.47808 13.6045 5.47808 14.02 5.72861 14.2706C5.97915 14.5211 6.39467 14.5211 6.6452 14.2706Z" fill="#242933"/>
+    </svg>
+  `;
+}
+
+/**
+ * Create calendar icon SVG
+ * @returns {string}
+ */
+function createCalendarIcon() {
+  return `
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6.6803 4.79166C6.33863 4.79166 6.0553 4.50832 6.0553 4.16666V1.66666C6.0553 1.32499 6.33863 1.04166 6.6803 1.04166C7.02196 1.04166 7.3053 1.32499 7.3053 1.66666V4.16666C7.3053 4.50832 7.02196 4.79166 6.6803 4.79166Z" fill="#4F545E"/>
+      <path d="M13.347 4.79166C13.0054 4.79166 12.722 4.50832 12.722 4.16666V1.66666C12.722 1.32499 13.0054 1.04166 13.347 1.04166C13.6887 1.04166 13.972 1.32499 13.972 1.66666V4.16666C13.972 4.50832 13.6887 4.79166 13.347 4.79166Z" fill="#4F545E"/>
+      <path d="M17.097 8.19995H2.9303C2.58863 8.19995 2.3053 7.91662 2.3053 7.57495C2.3053 7.23328 2.58863 6.94995 2.9303 6.94995H17.097C17.4386 6.94995 17.722 7.23328 17.722 7.57495C17.722 7.91662 17.4386 8.19995 17.097 8.19995Z" fill="#4F545E"/>
+      <path d="M13.347 18.9584H6.68034C3.63867 18.9584 1.88867 17.2084 1.88867 14.1667V7.08335C1.88867 4.04169 3.63867 2.29169 6.68034 2.29169H13.347C16.3887 2.29169 18.1387 4.04169 18.1387 7.08335V14.1667C18.1387 17.2084 16.3887 18.9584 13.347 18.9584ZM6.68034 3.54169C4.29701 3.54169 3.13867 4.70002 3.13867 7.08335V14.1667C3.13867 16.55 4.29701 17.7084 6.68034 17.7084H13.347C15.7303 17.7084 16.8887 16.55 16.8887 14.1667V7.08335C16.8887 4.70002 15.7303 3.54169 13.347 3.54169H6.68034Z" fill="#4F545E"/>
+    </svg>
+  `;
+}
+
+/**
+ * Create dropdown arrow icon SVG
+ * @returns {string}
+ */
+function createDropdownArrowIcon() {
+  return `
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16.6 7.45833L11.1667 12.8917C10.525 13.5333 9.47502 13.5333 8.83336 12.8917L3.40002 7.45833" stroke="#4F545E" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `;
+}
+
+/**
+ * Create check icon SVG
+ * @returns {string}
+ */
+function createCheckIcon() {
+  return `
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 3L4.5 8.5L2 6" stroke="white" stroke-width="1.6666" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `;
+}
+
+/**
+ * Create small close icon SVG for tags
+ * @returns {string}
+ */
+function createSmallCloseIcon() {
+  return `
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 3L3 9M3 3L9 9" stroke="#4F545E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `;
+}
+
+/**
+ * Create agency checkbox item
+ * @param {object} agency - Agency data
+ * @param {boolean} isChecked - Whether the checkbox is checked
+ * @param {boolean} isHovered - Whether the item is hovered
+ * @returns {string}
+ */
+function createAgencyCheckboxItem(agency, isChecked = false, isHovered = false) {
+  const hoverClass = isHovered ? 'filter-dropdown-item-hover' : '';
+  const checkboxClass = isChecked ? 'filter-checkbox-checked' : 'filter-checkbox-unchecked';
+
+  return `
+    <div class="filter-dropdown-item ${hoverClass}" data-agency-id="${agency.id}">
+      <div class="filter-dropdown-item-content">
+        <span class="filter-dropdown-item-text">${agency.name}</span>
+        <div class="filter-checkbox ${checkboxClass}">
+          ${isChecked ? `<div class="filter-checkbox-bg">${createCheckIcon()}</div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Create filter category chip
+ * @param {object} category - Category data
+ * @param {boolean} isSelected - Whether the chip is selected
+ * @returns {string}
+ */
+function createFilterCategoryChip(category, isSelected = false) {
+  const selectedClass = isSelected ? 'filter-category-chip-selected' : '';
+  const closeIcon = isSelected ? createSmallCloseIcon() : '';
+
+  return `
+    <button class="filter-category-chip ${selectedClass}" data-category-id="${category.id}">
+      <span>${category.name}</span>
+      ${isSelected ? `<span class="filter-chip-close">${closeIcon}</span>` : ''}
+    </button>
+  `;
+}
+
+/**
+ * Create selected filter tag
+ * @param {object} item - Selected item data
+ * @param {string} type - Type of filter (agency, category)
+ * @returns {string}
+ */
+function createSelectedFilterTag(item, type) {
+  return `
+    <div class="selected-filter-tag" data-${type}-id="${item.id}">
+      <span class="selected-filter-tag-close">${createSmallCloseIcon()}</span>
+      <span class="selected-filter-tag-text">${item.name}</span>
+    </div>
+  `;
+}
+
+/**
+ * Create filter modal
+ * @param {Array} agencies - Array of agencies
+ * @param {Array} categories - Array of categories
+ * @param {object} selectedFilters - Currently selected filters
+ * @returns {string}
+ */
+export function createFilterModal(agencies = [], categories = [], selectedFilters = {}) {
+  const selectedAgencies = selectedFilters.agencies || [];
+  const selectedCategories = selectedFilters.categories || [];
+  const startDate = selectedFilters.startDate || '';
+  const endDate = selectedFilters.endDate || '';
+
+  const agencyCheckboxes = agencies.map(agency =>
+    createAgencyCheckboxItem(agency, selectedAgencies.some(sa => sa.id === agency.id))
+  ).join('');
+
+  const categoryChips = categories.map(category =>
+    createFilterCategoryChip(category, selectedCategories.some(sc => sc.id === category.id))
+  ).join('');
+
+  const selectedAgencyTags = selectedAgencies.map(agency =>
+    createSelectedFilterTag(agency, 'agency')
+  ).join('');
+
+  return `
+    <div class="filter-modal-overlay">
+      <div class="filter-modal">
+        <div class="filter-modal-content">
+          <!-- Header -->
+          <div class="filter-modal-header">
+            <button class="filter-modal-close" type="button">
+              ${createCloseIcon()}
+            </button>
+            <h2 class="filter-modal-title">فیلتر مورد نظرت رو اعمال کن</h2>
+          </div>
+
+          <!-- News Source Section -->
+          <div class="filter-section">
+            <label class="filter-section-label">منبع خبری</label>
+            <div class="filter-dropdown-wrapper">
+              <button class="filter-dropdown-toggle" type="button">
+                ${createDropdownArrowIcon()}
+                <span class="filter-dropdown-placeholder">منبع خبری رو انتخاب کن</span>
+              </button>
+              <div class="filter-dropdown-content">
+                <div class="filter-dropdown-scroll">
+                  <div class="filter-dropdown-scrollbar">
+                    <div class="filter-dropdown-scrollbar-track"></div>
+                  </div>
+                  <div class="filter-dropdown-list">
+                    ${agencyCheckboxes}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Selected Agencies Tags -->
+              ${selectedAgencies.length > 0 ? `
+                <div class="filter-selected-container">
+                  ${selectedAgencyTags}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Category Section -->
+          <div class="filter-section">
+            <label class="filter-section-label">دسته بندی</label>
+            <div class="filter-category-chips">
+              ${categoryChips}
+            </div>
+          </div>
+
+          <!-- Date Section -->
+          <div class="filter-section">
+            <label class="filter-section-label">تاریخ خبر</label>
+            <div class="filter-date-inputs">
+              <div class="filter-date-input">
+                <input type="text" class="filter-date-field" placeholder="۱۴۰۴/۰۵/۳۰" value="${startDate}" data-date-type="start">
+                <span class="filter-date-icon">${createCalendarIcon()}</span>
+              </div>
+              <div class="filter-date-input">
+                <input type="text" class="filter-date-field" placeholder="۱۴۰۴/۰۵/۰۱" value="${endDate}" data-date-type="end">
+                <span class="filter-date-icon">${createCalendarIcon()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="filter-modal-footer">
+          <button class="filter-apply-btn" type="button">فیلتر</button>
+          <button class="filter-clear-btn" type="button">حذف فیلتر</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
