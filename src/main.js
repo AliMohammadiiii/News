@@ -1,10 +1,14 @@
 import './styles.css';
-import { 
-  getNews, 
-  getCategories, 
-  getAgencies, 
+import {
+  getNews,
+  getCategories,
+  getAgencies,
   getFeaturedNews,
-  mockData 
+  mockData,
+  extractNewsList,
+  extractCategoriesList,
+  extractAgenciesList,
+  normalizeNewsItem
 } from './api.js';
 import {
   createTopBar,
@@ -48,16 +52,16 @@ class NewsApp {
         getNews({ limit: 10 })
       ]);
 
-      this.featuredNews = featuredResponse.data?.news || [];
-      this.latestNews = latestResponse.data?.news || [];
+      this.featuredNews = extractNewsList(featuredResponse).map(normalizeNewsItem);
+      this.latestNews = extractNewsList(latestResponse).map(normalizeNewsItem);
 
       try {
         const [categoriesResponse, agenciesResponse] = await Promise.all([
           getCategories(),
           getAgencies()
         ]);
-        this.categories = categoriesResponse.data?.categories || [];
-        this.agencies = agenciesResponse.data?.agencies || [];
+        this.categories = extractCategoriesList(categoriesResponse);
+        this.agencies = extractAgenciesList(agenciesResponse);
       } catch {
         const allNews = [...this.featuredNews, ...this.latestNews];
         const uniqueCategories = new Map();
@@ -90,7 +94,7 @@ class NewsApp {
       'آلمان: نگران بحران انسانی در اوکراین هستیم',
       'بانک‌ها به استانداردسازی صدور تأییدیه‌های اعتباری ملزم شدند',
       'حمله هوایی به مواضع داعش در سوریه',
-      'ذخایر استراتژیک دارو برای مقابله با اثرات فعال‌سازی مکانیسم ماشه شدند',
+      'ذخایر اس��راتژیک دارو برای مقابله با اثرات فعال‌سازی مکانیسم ماشه شدند',
       'نگران بحران انسانی در اوکراین هستیم',
       'جلسه مهم کابینه درباره وضعیت اقتصادی کشور',
       'کاهش قیمت نفت در بازارهای جهانی',
@@ -102,7 +106,7 @@ class NewsApp {
       'حسین امیرعبداللهیان گفت: «ما همچنان امیدواریم که مذاکرات به نتیجه برسد و منافع ملت ایران تأمین شود»',
       'وزیر امور خارجه آلمان اعلام کرد که کشورش از ادامه حمایت‌های بشردوستانه به مردم اوکراین حمایت خواهد کرد.',
       'بانک مرکزی اعلام کرد که تمامی بانک‌ها ملزم به رعایت استانداردهای جدید هستند.',
-      'نیروهای ائتلاف بین‌المللی موفق به هدف‌گیری چندین موضع گروه داعش در شمال سوریه شدند.',
+      '��یروهای ائتلاف بین‌المللی موفق به هدف‌گیری چندین موضع گروه داعش در شمال سوریه شدند.',
       'وزارت بهداشت اعلام کرد که ذخایر دارویی کشور در وضعیت مطلوبی قرار دارد.',
       'سازمان ملل نسبت به وضعیت انسان‌دوستانه در منطقه ابراز نگرانی کرد.',
       'رئیس جمهور در جلسه کابینه بر ضرورت اقدامات فوری اقتصادی تاکید کرد.',
@@ -322,7 +326,7 @@ class NewsApp {
     try {
       this.setLoading(true);
       const response = await getNews({ ...filters, limit: 10 });
-      this.latestNews = response.data?.news || [];
+      this.latestNews = extractNewsList(response).map(normalizeNewsItem);
       this.updateNewsList();
     } catch (error) {
       console.error('Failed to load news:', error);
