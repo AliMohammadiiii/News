@@ -209,6 +209,7 @@ img {
   font-size: var(--font-size-xs);
   font-weight: 500;
   line-height: var(--font-line-height-sm);
+  text-decoration: none;
 }
 
 .featured-card-title {
@@ -330,6 +331,7 @@ img {
   font-size: var(--font-size-xs);
   font-weight: 500;
   line-height: var(--font-line-height-sm);
+  text-decoration: none;
 }
 
 .news-card-content {
