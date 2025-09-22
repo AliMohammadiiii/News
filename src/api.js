@@ -1,15 +1,39 @@
 // API Base URL - you can change this to your actual API endpoint
-const API_BASE_URL = '';
+const API_BASE_URL = resolveApiBase();
+
+/**
+ * Resolve API base URL with priority:
+ * 1) URL query ?apiBase=...
+ * 2) localStorage 'apiBase'
+ * 3) import.meta.env.VITE_API_BASE_URL
+ * 4) same-origin ('')
+ */
+function resolveApiBase() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fromQuery = params.get('apiBase');
+    if (fromQuery) {
+      localStorage.setItem('apiBase', fromQuery);
+      return fromQuery.replace(/\/$/, '');
+    }
+    const fromStorage = localStorage.getItem('apiBase');
+    if (fromStorage) return fromStorage.replace(/\/$/, '');
+    const fromEnv = import.meta?.env?.VITE_API_BASE_URL;
+    if (fromEnv) return String(fromEnv).replace(/\/$/, '');
+  } catch {}
+  return '';
+}
 
 /**
  * Generic API request function
- * @param {string} endpoint 
- * @param {object} options 
+ * @param {string} endpoint
+ * @param {object} options
  * @returns {Promise<any>}
  */
 async function apiRequest(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
-  
+  const base = API_BASE_URL || '';
+  const url = `${base}${endpoint}`;
+
   try {
     const response = await fetch(url, {
       headers: {
@@ -21,7 +45,8 @@ async function apiRequest(endpoint, options = {}) {
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const text = await response.text().catch(() => '');
+      throw new Error(`HTTP ${response.status} ${response.statusText} - ${url} - ${text?.slice(0,200)}`);
     }
     
     const data = await response.json();
