@@ -42,31 +42,42 @@ class NewsApp {
 
   async loadInitialData() {
     this.setLoading(true);
-    
     try {
-      // Try to load real data first, fallback to mock data
+      const [featuredResponse, latestResponse] = await Promise.all([
+        getFeaturedNews(5),
+        getNews({ limit: 10 })
+      ]);
+
+      this.featuredNews = featuredResponse.data?.news || [];
+      this.latestNews = latestResponse.data?.news || [];
+
       try {
-        const [featuredResponse, latestResponse, categoriesResponse, agenciesResponse] = await Promise.all([
-          getFeaturedNews(5),
-          getNews({ limit: 10 }),
+        const [categoriesResponse, agenciesResponse] = await Promise.all([
           getCategories(),
           getAgencies()
         ]);
-
-        this.featuredNews = featuredResponse.data?.news || [];
-        this.latestNews = latestResponse.data?.news || [];
         this.categories = categoriesResponse.data?.categories || [];
         this.agencies = agenciesResponse.data?.agencies || [];
-      } catch (apiError) {
-        console.warn('API not available, using mock data:', apiError);
-        // Use mock data
-        this.categories = mockData.categories;
-        this.agencies = mockData.agencies;
-        
-        // Generate some mock news
-        this.featuredNews = this.generateMockNews(5, true);
-        this.latestNews = this.generateMockNews(10, false);
+      } catch {
+        const allNews = [...this.featuredNews, ...this.latestNews];
+        const uniqueCategories = new Map();
+        const uniqueAgencies = new Map();
+        allNews.forEach(n => {
+          if (n?.category?.id && !uniqueCategories.has(n.category.id)) {
+            uniqueCategories.set(n.category.id, n.category);
+          }
+          if (n?.agency?.id && !uniqueAgencies.has(n.agency.id)) {
+            uniqueAgencies.set(n.agency.id, n.agency);
+          }
+        });
+        this.categories = Array.from(uniqueCategories.values());
+        this.agencies = Array.from(uniqueAgencies.values());
       }
+    } catch (error) {
+      console.error('Failed to load initial data:', error);
+      this.featuredNews = [];
+      this.latestNews = [];
+      throw error;
     } finally {
       this.setLoading(false);
     }
@@ -75,7 +86,7 @@ class NewsApp {
   generateMockNews(count, featured = false) {
     const mockTitles = [
       'ترامپ: آمریکا در صورت ادامه تشدید اقدامات روسیه، به دفاع از لهستان کمک خواهد کرد',
-      'وزیر خارجه ایران: گفت‌وگوها برای احیای برجام ادامه دارد',
+      'وزیر خارجه ایران: گفت‌وگوها بر��ی احیای برجام ادامه دارد',
       'آلمان: نگران بحران انسانی در اوکراین هستیم',
       'بانک‌ها به استانداردسازی صدور تأییدیه‌های اعتباری ملزم شدند',
       'حمله هوایی به مواضع داعش در سوریه',
@@ -162,9 +173,8 @@ class NewsApp {
       return '<p class="loading">خبری یافت نشد</p>';
     }
 
-    return this.latestNews.map((news, index) => {
-      // Alternate between cards with and without images
-      const hasImage = news.image_url && (index % 3 !== 2);
+    return this.latestNews.map((news) => {
+      const hasImage = Boolean(news.image_url);
       return createNewsCard(news, hasImage);
     }).join('');
   }
