@@ -1,5 +1,5 @@
 // API Base URL - you can change this to your actual API endpoint
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = '';
 
 /**
  * Generic API request function
